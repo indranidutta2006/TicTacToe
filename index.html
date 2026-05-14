@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .cell { width: 60px; height: 60px; border: 1px solid green; display: inline-block; 
+                text-align: center; line-height: 60px; font-size: 24px; cursor: pointer; }
+        .row { display: block; }
+    </style>
+</head>
+<body>
+    <h2 id="status">Player X's Turn</h2>
+    <div id="game-board"></div>
+    <button onclick="reset()">Restart</button>
+
+    <script>
+        async function loadBoard() {
+            const res = await fetch('/api/game/board');
+            const data = await res.json();
+            const boardDiv = document.getElementById('game-board');
+            boardDiv.innerHTML = '';
+            data.forEach((row, r) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+                row.forEach((cell, c) => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell';
+                    cellDiv.innerText = cell;
+                    cellDiv.onclick = () => move(r, c);
+                    rowDiv.appendChild(cellDiv);
+                });
+                boardDiv.appendChild(rowDiv);
+            });
+        }
+        async function move(r, c) {
+            const res = await fetch(`/api/game/move?row=${r}&col=${c}`, {method: 'POST'});
+            document.getElementById('status').innerText = await res.text();
+            loadBoard();
+        }
+        async function reset() {
+            await fetch('/api/game/reset', {method: 'POST'});
+            document.getElementById('status').innerText = "Player X's Turn";
+            loadBoard();
+        }
+        loadBoard();
+    </script>
+</body>
+</html>
