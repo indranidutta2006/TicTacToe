@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: tictactoe-game
+    runtime: java
+    buildCommand: ./mvnw clean install
+    startCommand: java -jar target/tictactoe-web-1.0-SNAPSHOT.jar
